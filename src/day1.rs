@@ -1,5 +1,6 @@
 use inttable::IntTable;
 use once_cell::sync::Lazy;
+use itertools::Itertools;
 
 use crate::{day, utils};
 
@@ -14,12 +15,12 @@ fn parser(input: String, _verbose: bool) -> Result<Input, String> {
                 .map(|num| num.parse::<u32>().unwrap());
             (nums.next().unwrap(), nums.next().unwrap())
         })
-        .collect::<Vec<_>>())
+        .collect_vec())
 }
 
 fn part_a(input: &Input) -> Option<String> {
-    let mut a = input.iter().map(|a| a.0).collect::<Vec<_>>();
-    let mut b = input.iter().map(|a| a.1).collect::<Vec<_>>();
+    let mut a = input.iter().map(|a| a.0).collect_vec();
+    let mut b = input.iter().map(|a| a.1).collect_vec();
 
     radsort::sort(&mut a);
     radsort::sort(&mut b);
@@ -37,14 +38,7 @@ fn part_b(input: &Input) -> Option<String> {
     let mut times: IntTable<u32> = IntTable::with_capacity(1 << (input.len().ilog2() + 1));
 
     for i in input.iter().map(|a| a.1) {
-        match times.get_mut(i as u64) {
-            Some(a) => {
-                *a += 1;
-            }
-            None => {
-                times.insert(i as u64, 1);
-            }
-        }
+        *times.entry(i as u64).or_insert(0) += 1;
     }
 
     let res = input
@@ -72,13 +66,25 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
     // example for aoc day5 in 2021:
     //
     // use crate::utils;
-    //
-    // test: vec![utils::golden("day5", &DAY, Some("5"), Some("12"))],
-    tests: vec![utils::golden("day1", &DAY, Some("11"), Some("31"))],
-    ignore_failed_tests: true, // toggle to false to make the program exit if a test fails useful for debugging
 
     // do not touch
     parser: Box::new(parser),
     part_a: Box::new(part_a),
     part_b: Box::new(part_b),
 });
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn goldens() {
+        utils::golden("day1", &DAY, Some("11"), Some("31"), false)
+    }
+
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
+
+    }
+}
