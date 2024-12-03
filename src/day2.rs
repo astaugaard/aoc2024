@@ -137,8 +137,6 @@ fn is_safe2(row: &[i32]) -> bool {
         }
     }
 
-    // println!("passed completely");
-
     return true;
 }
 
@@ -168,7 +166,11 @@ mod tests {
     }
 
     prop_compose! {
-        fn passinglist()(diffs in (collection::vec(1..=3i32,1..10)), increase in arbitrary::any::<bool>(), start_val in -10..10i32) -> Vec<i32> {
+        fn passinglist()(
+            diffs in (collection::vec(1..=3i32,1..10)),
+            increase in arbitrary::any::<bool>(),
+            start_val in -10..10i32)
+                -> Vec<i32> {
             diffs.into_iter().map(|a| if increase {a} else {-a})
                 .scan(
                     start_val, |a,b|
