@@ -1,15 +1,78 @@
+use crate::day;
+use crate::utils;
+use inttable::IntTable;
+use itertools::Itertools;
 use once_cell::sync::Lazy;
 
-use crate::day;
+type Input = (Vec<(u64, u64)>, Vec<Vec<u64>>);
 
-type Input = ();
+fn parser(input: String, _verbose: bool) -> Result<Input, String> {
+    let (b, a) = input.split_once("\n\n").unwrap();
 
-fn parser(_input: String, _verbose: bool) -> Result<Input, String> {
-    Ok(())
+    let beforeConds = b
+        .lines()
+        .map(|line| {
+            let (a, b) = line.split_once('|').unwrap();
+            (a.parse::<u64>().unwrap(), b.parse::<u64>().unwrap())
+        })
+        .collect_vec();
+    let afterRows = a
+        .lines()
+        .map(|line| {
+            line.split(',')
+                .map(|n| n.parse::<u64>().unwrap())
+                .collect_vec()
+        })
+        .collect_vec();
+
+    Ok((beforeConds, afterRows))
 }
 
-fn part_a(_input: &Input) -> Option<String> {
-    None
+fn valid_edit(edit: &Vec<u64>, after: &IntTable<Vec<u64>>) -> bool {
+    let mut used: IntTable<()> = IntTable::with_capacity(edit.len() * 2);
+
+    for page in edit {
+        for needAfter in after.get(*page).unwrap_or(&Vec::new()) {
+            if used.contains_key(*needAfter) {
+                return false;
+            }
+        }
+        let _ = used.insert(*page, ());
+    }
+
+    true
+}
+
+fn part_a(input: &Input) -> Option<String> {
+    let mut after = IntTable::new();
+
+    for (bef, aft) in input.0.iter() {
+        after.entry(*bef).or_insert(Vec::new()).push(*aft)
+    }
+
+    let res: u64 = input
+        .1
+        .iter()
+        .filter(|line| valid_edit(&line, &after))
+        .map(|line| line[line.len() / 2])
+        .sum();
+
+    Some(res.to_string())
+}
+
+fn fix_edit(edit: &mut Vec<u64>, after: &IntTable<Vec<u64>>) -> bool {
+    let mut used: IntTable<usize> = IntTable::with_capacity(edit.len() * 2);
+
+    for (ind,page) in edit.iter().enumerate() {
+        for needAfter in after.get(*page).unwrap_or(&Vec::new()) {
+            if let Some(loc) = used.get(*needAfter) {
+                std::mem::swap(edit[loc],)
+            }
+        }
+        let _ = used.insert(*page, ind);
+    }
+
+    true
 }
 
 fn part_b(_input: &Input) -> Option<String> {
@@ -22,3 +85,12 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
     part_a: Box::new(part_a),
     part_b: Box::new(part_b),
 });
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn goldens() {
+        utils::golden("day5", &DAY, Some("143"), None, false)
+    }
+}
