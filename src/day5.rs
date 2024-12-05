@@ -60,23 +60,60 @@ fn part_a(input: &Input) -> Option<String> {
     Some(res.to_string())
 }
 
-fn fix_edit(edit: &mut Vec<u64>, after: &IntTable<Vec<u64>>) -> bool {
-    let mut used: IntTable<usize> = IntTable::with_capacity(edit.len() * 2);
+fn fix_edit(edit: &Vec<u64>, after: &IntTable<Vec<u64>>) -> Vec<u64> {
+    let mut used: IntTable<()> = IntTable::with_capacity(edit.len() * 2);
+    let mut res = Vec::with_capacity(edit.len());
+    let mut contains = IntTable::with_capacity(edit.len() * 2);
 
-    for (ind,page) in edit.iter().enumerate() {
-        for needAfter in after.get(*page).unwrap_or(&Vec::new()) {
-            if let Some(loc) = used.get(*needAfter) {
-                std::mem::swap(edit[loc],)
-            }
-        }
-        let _ = used.insert(*page, ind);
+    for i in edit {
+        let _ = contains.insert(*i, ());
     }
 
-    true
+    for i in edit {
+        dfs(&mut res, &mut used, after, &contains, *i);
+    }
+
+    println!("{:?}", res);
+
+    res
 }
 
-fn part_b(_input: &Input) -> Option<String> {
-    None
+fn dfs(res: &mut Vec<u64>, used: &mut IntTable<()>, after: &IntTable<Vec<u64>>, contains: &IntTable<()>, i: u64) {
+    if used.contains_key(i) {
+        return;
+    }
+
+    if !contains.contains_key(i) {
+	return;
+    }
+
+    used.insert(i, ());
+
+    for loc in after.get(i).unwrap_or(&Vec::new()) {
+        dfs(res, used, after, contains, *loc)
+    }
+
+    res.push(i)
+}
+
+fn part_b(input: &Input) -> Option<String> {
+
+    println!("{:#?}", input);
+    let mut after = IntTable::new();
+
+    for (bef, aft) in input.0.iter() {
+        after.entry(*bef).or_insert(Vec::new()).push(*aft)
+    }
+
+    let res: u64 = input
+        .1
+        .iter()
+        .filter(|line| !valid_edit(line, &after))
+        .map(|line| fix_edit(line, &after))
+        .map(|line| line[line.len() / 2])
+        .sum();
+
+    Some(res.to_string())
 }
 
 pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
@@ -91,6 +128,6 @@ mod tests {
     use super::*;
     #[test]
     fn goldens() {
-        utils::golden("day5", &DAY, Some("143"), None, false)
+        utils::golden("day5", &DAY, Some("143"), Some("123"), false)
     }
 }
