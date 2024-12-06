@@ -72,8 +72,6 @@ fn fix_edit(edit: &Vec<u64>, after: &IntTable<Vec<u64>>) -> Vec<u64> {
         dfs(&mut res, &mut used, after, &contains, *i);
     }
 
-    println!("{:?}", res);
-
     res
 }
 
@@ -96,8 +94,6 @@ fn dfs(res: &mut Vec<u64>, used: &mut IntTable<()>, after: &IntTable<Vec<u64>>, 
 }
 
 fn part_b(input: &Input) -> Option<String> {
-
-    println!("{:#?}", input);
     let mut after = IntTable::new();
 
     for (bef, aft) in input.0.iter() {
