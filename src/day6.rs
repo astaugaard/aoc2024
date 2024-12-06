@@ -80,7 +80,7 @@ fn advance(field: &Vec<BitVec>, x: &mut i32, y: &mut i32, dx: &mut i32, dy: &mut
 fn part_a(input: &Input) -> Option<String> {
     let field = &input.0;
 
-    let mut visited = vec![bitvec![0; field[0].len()]; field.len()];
+    let visited = vec![bitvec![0; field[0].len()]; field.len()];
 
     let mut res = 0;
 
@@ -97,8 +97,171 @@ fn part_a(input: &Input) -> Option<String> {
     Some(res.to_string())
 }
 
-fn part_b(_input: &Input) -> Option<String> {
-    None
+#[derive(Copy, Clone, Debug)]
+struct Pos {
+    n: bool,
+    e: bool,
+    w: bool,
+    s: bool,
+}
+
+fn checkloop_go(
+    field: &Vec<BitVec>,
+    mut x: i32,
+    mut y: i32,
+    mut dx: i32,
+    mut dy: i32,
+    mut prev: Vec<Vec<Pos>>,
+) -> bool {
+    if y >= (field.len() as i32) || y < 0 || x < 0 || x >= (field[0].len() as i32) {
+        return false;
+    }
+
+    if dirMatches(prev[y as usize][x as usize], dx, dy) {
+        return true;
+    }
+
+    add_dir(&mut prev[y as usize][x as usize], dx, dy);
+
+    advance(field, &mut x, &mut y, &mut dx, &mut dy);
+
+    checkloop_go(field, x, y, dx, dy, prev)
+}
+
+fn dirMatches(dir: Pos, dx: i32, dy: i32) -> bool {
+    if dy == -1 {
+        dir.n
+    } else if dy == 1 {
+        dir.s
+    } else if dx == 1 {
+        dir.e
+    } else {
+        dir.w
+    }
+}
+
+fn add_dir(dir: &mut Pos, dx: i32, dy: i32) {
+    if dy == -1 {
+        dir.n = true
+    } else if dy == 1 {
+        dir.s = true
+    } else if dx == 1 {
+        dir.e = true
+    } else {
+        dir.w = true
+    }
+}
+
+fn checkloop(
+    field: &mut Vec<BitVec>,
+    checked: &mut Vec<BitVec>,
+    x: i32,
+    y: i32,
+    dx: i32,
+    dy: i32,
+) -> bool {
+    if checked[(y + dy) as usize][(x + dx) as usize] {
+        return false;
+    }
+
+    field[(y + dy) as usize].set((x + dx) as usize, true);
+    checked[(y + dy) as usize].set((x + dx) as usize, true);
+
+    let prev = vec![
+        vec![
+            Pos {
+                n: false,
+                e: false,
+                w: false,
+                s: false
+            };
+            field[0].len()
+        ];
+        field[0].len()
+    ];
+
+    let res = checkloop_go(field, x, y, dx, dy, prev);
+
+    field[(y + dy) as usize].set((x + dx) as usize, false);
+
+    res
+}
+
+fn find_num2(
+    field: &mut Vec<BitVec>,
+    checked: &mut Vec<BitVec>,
+    mut x: i32,
+    mut y: i32,
+    mut dx: i32,
+    mut dy: i32,
+    count: &mut usize,
+) {
+    if y >= (field.len() as i32) || y < 0 || x < 0 || x >= (field[0].len() as i32) {
+        return;
+    }
+
+    advance2(field, checked, &mut x, &mut y, &mut dx, &mut dy, count);
+
+    find_num2(field, checked, x, y, dx, dy, count);
+}
+
+fn advance2(
+    field: &mut Vec<BitVec>,
+    checked: &mut Vec<BitVec>,
+    x: &mut i32,
+    y: &mut i32,
+    dx: &mut i32,
+    dy: &mut i32,
+    count: &mut usize,
+) {
+    let nx = *dx + *x;
+    let ny = *dy + *y;
+
+    if ny >= (field.len() as i32) || ny < 0 || nx < 0 || nx >= (field[0].len() as i32) {
+        *x = nx;
+        *y = ny;
+        return;
+    }
+
+    checked[*y as usize].set(*x as usize, true);
+
+    if !field[ny as usize][nx as usize] {
+        if checkloop(field, checked, *x, *y, *dx, *dy) {
+            *count += 1;
+        }
+
+        *x = nx;
+        *y = ny;
+
+        return;
+    }
+
+
+    let odx = *dx;
+    *dx = *dy * -1;
+    *dy = odx;
+
+    advance(field, x, y, dx, dy);
+}
+
+fn part_b(input: &Input) -> Option<String> {
+    let mut field = input.0.clone();
+
+    let mut checked = vec![bitvec![0; field[0].len()]; field.len()];
+
+    let mut res = 0;
+
+    find_num2(
+        &mut field,
+        &mut checked,
+        input.1 .0 as i32,
+        input.1 .1 as i32,
+        0,
+        -1,
+        &mut res,
+    );
+
+    Some(res.to_string())
 }
 
 pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
@@ -114,7 +277,7 @@ mod tests {
 
     #[test]
     fn goldens() {
-        utils::golden("day6", &DAY, Some("41"), None, false)
+        utils::golden("day6", &DAY, Some("41"), Some("6"), false)
     }
 
     // #[test]
