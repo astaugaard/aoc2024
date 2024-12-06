@@ -6,6 +6,7 @@ use std::{
 
 use chrono::{self, FixedOffset, TimeZone, Utc};
 use clap::{Parser, Subcommand};
+use std::time;
 
 mod day;
 
@@ -102,6 +103,9 @@ fn main() {
     // let default_parallelism_approx = available_parallelism().unwrap().get();
 
     // println!("threads: {}", default_parallelism_approx);
+    //
+    rayon::ThreadPoolBuilder::new().build_global().unwrap();
+    std::thread::sleep(time::Duration::from_millis(10));
 
     match args.command {
         Commands::Day { day } => {

@@ -1,7 +1,6 @@
 use inttable::IntTable;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
-use rayon::slice::ParallelSliceMut;
 
 use crate::day;
 

@@ -5,7 +5,6 @@ use bitvec::vec::BitVec;
 use once_cell::sync::Lazy;
 use rayon::iter::ParallelBridge;
 use rayon::iter::ParallelIterator;
-use rayon::prelude::*;
 
 type Input = (Vec<BitVec>, (usize, usize));
 
@@ -127,12 +126,12 @@ fn checkloop_go(
 
     add_dir(&mut prev[y as usize][x as usize], dx, dy);
 
-    advance4(field, &mut x, &mut y, lx, ly, &mut dx, &mut dy);
+    advance_with_loc(field, &mut x, &mut y, lx, ly, &mut dx, &mut dy);
 
     checkloop_go(field, x, y, lx, ly, dx, dy, prev)
 }
 
-fn advance4(
+fn advance_with_loc(
     field: &Vec<BitVec>,
     x: &mut i32,
     y: &mut i32,
@@ -160,7 +159,7 @@ fn advance4(
     *dx = *dy * -1;
     *dy = odx;
 
-    advance4(field, x, y, lx, ly, dx, dy);
+    advance_with_loc(field, x, y, lx, ly, dx, dy);
 }
 
 fn dir_matches(dir: Pos, dx: i32, dy: i32) -> bool {
@@ -189,7 +188,7 @@ fn add_dir(dir: &mut Pos, dx: i32, dy: i32) {
 
 fn checkloop(field: &Vec<BitVec>, x: i32, y: i32, dx: i32, dy: i32) -> bool {
     // field[(y + dy) as usize].set((x + dx) as usize, true);
-    let mut prev = vec![
+    let prev = vec![
         vec![
             Pos {
                 n: false,
@@ -232,7 +231,7 @@ impl<'a> Iterator for FindSplits<'a> {
 
         self.visited[self.y as usize].set(self.x as usize, true);
 
-        if let Some(a) = advance3(
+        if let Some(a) = advance_find_split(
             self.field,
             &self.visited,
             &mut self.x,
@@ -248,7 +247,7 @@ impl<'a> Iterator for FindSplits<'a> {
 }
 
 fn findsplits(field: &Vec<BitVec>, x: i32, y: i32, dx: i32, dy: i32) -> FindSplits {
-    let mut visited = vec![bitvec![0; field[0].len()]; field.len()];
+    let visited = vec![bitvec![0; field[0].len()]; field.len()];
     FindSplits {
         field,
         visited,
@@ -259,7 +258,7 @@ fn findsplits(field: &Vec<BitVec>, x: i32, y: i32, dx: i32, dy: i32) -> FindSpli
     }
 }
 
-fn advance3(
+fn advance_find_split(
     field: &Vec<BitVec>,
     visited: &Vec<BitVec>,
     x: &mut i32,
@@ -291,63 +290,7 @@ fn advance3(
     *dx = *dy * -1;
     *dy = odx;
 
-    advance3(field, visited, x, y, dx, dy)
-}
-
-fn find_num2(
-    field: &mut Vec<BitVec>,
-    visited: &mut Vec<BitVec>,
-    mut x: i32,
-    mut y: i32,
-    sx: i32,
-    sy: i32,
-    mut dx: i32,
-    mut dy: i32,
-    count: &mut usize,
-) {
-    if y >= (field.len() as i32) || y < 0 || x < 0 || x >= (field[0].len() as i32) {
-        return;
-    }
-
-    visited[y as usize].set(x as usize, true);
-
-    advance2(field, &visited, &mut x, &mut y, &mut dx, &mut dy, count);
-
-    find_num2(field, visited, x, y, sx, sy, dx, dy, count);
-}
-
-fn advance2(
-    field: &mut Vec<BitVec>,
-    visited: &Vec<BitVec>,
-    x: &mut i32,
-    y: &mut i32,
-    dx: &mut i32,
-    dy: &mut i32,
-    count: &mut usize,
-) {
-    let nx = *dx + *x;
-    let ny = *dy + *y;
-
-    if ny >= (field.len() as i32) || ny < 0 || nx < 0 || nx >= (field[0].len() as i32) {
-        *x = nx;
-        *y = ny;
-        return;
-    }
-
-    if !field[ny as usize][nx as usize] {
-        if !visited[ny as usize][nx as usize] && checkloop(field, *x, *y, *dx, *dy) {
-            *count += 1;
-        }
-        *x = nx;
-        *y = ny;
-        return;
-    }
-
-    let odx = *dx;
-    *dx = *dy * -1;
-    *dy = odx;
-
-    advance2(field, visited, x, y, dx, dy, count)
+    advance_find_split(field, visited, x, y, dx, dy)
 }
 
 fn part_b(input: &Input) -> Option<String> {
@@ -355,7 +298,7 @@ fn part_b(input: &Input) -> Option<String> {
         findsplits(&input.0, input.1 .0 as i32, input.1 .1 as i32, 0, -1)
             .par_bridge()
             .map(|(x, y, dx, dy)| {
-                let mut field = input.0.clone();
+                let field = input.0.clone();
                 if checkloop(&field, x, y, dx, dy) {
                     1
                 } else {
