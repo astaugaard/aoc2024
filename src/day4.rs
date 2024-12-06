@@ -93,9 +93,8 @@ mod tests {
         utils::golden("day4", &DAY, Some("18"), Some("9"), false)
     }
 
-    // #[test]
-    // fn finalanswer() {
-    //     utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-
-    // }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(4, &DAY, Some("2496"), Some("1967"), false);
+    }
 }

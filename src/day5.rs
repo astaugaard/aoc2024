@@ -130,4 +130,8 @@ mod tests {
     fn goldens() {
         utils::golden("day5", &DAY, Some("143"), Some("123"), false)
     }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(5, &DAY, Some("5713"), Some("5180"), false);
+    }
 }

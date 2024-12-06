@@ -72,8 +72,8 @@ mod tests {
         utils::golden("day3", &DAY, Some("161"), None, false)
     }
 
-    // #[test]
-    // fn finalanswer() {
-    //     utils::finalanswer(2, &DAY, Some("402"), Some("455"), false)
-    // }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(3, &DAY, Some("179571322"), Some("103811193"), false)
+    }
 }
