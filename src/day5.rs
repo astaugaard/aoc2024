@@ -1,5 +1,4 @@
 use crate::day;
-use crate::utils;
 use inttable::IntTable;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
@@ -126,6 +125,8 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::utils;
+
     #[test]
     fn goldens() {
         utils::golden("day5", &DAY, Some("143"), Some("123"), false)

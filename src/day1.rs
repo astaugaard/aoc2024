@@ -1,8 +1,8 @@
 use inttable::IntTable;
-use once_cell::sync::Lazy;
 use itertools::Itertools;
+use once_cell::sync::Lazy;
 
-use crate::{day, utils};
+use crate::day;
 
 type Input = Vec<(u32, u32)>;
 
@@ -76,6 +76,7 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::utils;
 
     #[test]
     fn goldens() {
@@ -85,6 +86,5 @@ mod tests {
     #[test]
     fn finalanswer() {
         utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-
     }
 }

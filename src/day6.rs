@@ -1,5 +1,4 @@
 use crate::day;
-use crate::utils;
 use bitvec::bitvec;
 use bitvec::vec::BitVec;
 use itertools::Itertools;
@@ -262,6 +261,7 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use crate::utils;
 
     #[test]
     fn goldens() {

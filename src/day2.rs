@@ -1,5 +1,4 @@
 use crate::day;
-use crate::utils;
 use itertools::Itertools;
 use itertools::*;
 use once_cell::sync::Lazy;
@@ -154,6 +153,7 @@ mod tests {
     use proptest::prelude::*;
 
     use super::*;
+    use crate::utils;
 
     #[test]
     fn goldens() {
