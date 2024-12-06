@@ -152,21 +152,7 @@ fn add_dir(dir: &mut Pos, dx: i32, dy: i32) {
     }
 }
 
-fn checkloop(
-    field: &mut Vec<BitVec>,
-    checked: &mut Vec<BitVec>,
-    x: i32,
-    y: i32,
-    dx: i32,
-    dy: i32,
-) -> bool {
-    if checked[(y + dy) as usize][(x + dx) as usize] {
-        return false;
-    }
-
-    field[(y + dy) as usize].set((x + dx) as usize, true);
-    checked[(y + dy) as usize].set((x + dx) as usize, true);
-
+fn checkloop(field: &mut Vec<BitVec>, sx: i32, sy: i32) -> bool {
     let prev = vec![
         vec![
             Pos {
@@ -177,12 +163,10 @@ fn checkloop(
             };
             field[0].len()
         ];
-        field[0].len()
+        field.len()
     ];
 
-    let res = checkloop_go(field, x, y, dx, dy, prev);
-
-    field[(y + dy) as usize].set((x + dx) as usize, false);
+    let res = checkloop_go(field, sx, sy, 0, -1, prev);
 
     res
 }
@@ -192,6 +176,8 @@ fn find_num2(
     checked: &mut Vec<BitVec>,
     mut x: i32,
     mut y: i32,
+    sx: i32,
+    sy: i32,
     mut dx: i32,
     mut dy: i32,
     count: &mut usize,
@@ -200,14 +186,23 @@ fn find_num2(
         return;
     }
 
-    advance2(field, checked, &mut x, &mut y, &mut dx, &mut dy, count);
+    if !checked[y as usize][x as usize] {
+        field[y as usize].set(x as usize, true);
+        if checkloop(field, sx, sy) {
+            *count += 1;
+        }
+        field[y as usize].set(x as usize, false);
+    }
 
-    find_num2(field, checked, x, y, dx, dy, count);
+    checked[y as usize].set(x as usize, true);
+
+    advance2(field, &mut x, &mut y, &mut dx, &mut dy, count);
+
+    find_num2(field, checked, x, y, sx, sy, dx, dy, count);
 }
 
 fn advance2(
     field: &mut Vec<BitVec>,
-    checked: &mut Vec<BitVec>,
     x: &mut i32,
     y: &mut i32,
     dx: &mut i32,
@@ -223,19 +218,11 @@ fn advance2(
         return;
     }
 
-    checked[*y as usize].set(*x as usize, true);
-
     if !field[ny as usize][nx as usize] {
-        if checkloop(field, checked, *x, *y, *dx, *dy) {
-            *count += 1;
-        }
-
         *x = nx;
         *y = ny;
-
         return;
     }
-
 
     let odx = *dx;
     *dx = *dy * -1;
@@ -254,6 +241,8 @@ fn part_b(input: &Input) -> Option<String> {
     find_num2(
         &mut field,
         &mut checked,
+        input.1 .0 as i32,
+        input.1 .1 as i32,
         input.1 .0 as i32,
         input.1 .1 as i32,
         0,
