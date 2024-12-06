@@ -152,7 +152,8 @@ fn add_dir(dir: &mut Pos, dx: i32, dy: i32) {
     }
 }
 
-fn checkloop(field: &mut Vec<BitVec>, sx: i32, sy: i32) -> bool {
+fn checkloop(field: &mut Vec<BitVec>, x: i32, y: i32, dx: i32, dy: i32) -> bool {
+    field[(y + dy) as usize].set((x + dx) as usize, true);
     let prev = vec![
         vec![
             Pos {
@@ -166,14 +167,16 @@ fn checkloop(field: &mut Vec<BitVec>, sx: i32, sy: i32) -> bool {
         field.len()
     ];
 
-    let res = checkloop_go(field, sx, sy, 0, -1, prev);
+    let res = checkloop_go(field, x, y, dx, dy, prev);
+
+    field[(y + dy) as usize].set((x + dx) as usize, false);
 
     res
 }
 
 fn find_num2(
     field: &mut Vec<BitVec>,
-    checked: &mut Vec<BitVec>,
+    visited: &mut Vec<BitVec>,
     mut x: i32,
     mut y: i32,
     sx: i32,
@@ -186,23 +189,16 @@ fn find_num2(
         return;
     }
 
-    if !checked[y as usize][x as usize] {
-        field[y as usize].set(x as usize, true);
-        if checkloop(field, sx, sy) {
-            *count += 1;
-        }
-        field[y as usize].set(x as usize, false);
-    }
+    visited[y as usize].set(x as usize, true);
 
-    checked[y as usize].set(x as usize, true);
+    advance2(field, &visited, &mut x, &mut y, &mut dx, &mut dy, count);
 
-    advance2(field, &mut x, &mut y, &mut dx, &mut dy, count);
-
-    find_num2(field, checked, x, y, sx, sy, dx, dy, count);
+    find_num2(field, visited, x, y, sx, sy, dx, dy, count);
 }
 
 fn advance2(
     field: &mut Vec<BitVec>,
+    visited: &Vec<BitVec>,
     x: &mut i32,
     y: &mut i32,
     dx: &mut i32,
@@ -219,6 +215,9 @@ fn advance2(
     }
 
     if !field[ny as usize][nx as usize] {
+        if !visited[ny as usize][nx as usize] && checkloop(field, *x, *y, *dx, *dy) {
+            *count += 1;
+        }
         *x = nx;
         *y = ny;
         return;
@@ -228,19 +227,19 @@ fn advance2(
     *dx = *dy * -1;
     *dy = odx;
 
-    advance(field, x, y, dx, dy);
+    advance2(field, visited, x, y, dx, dy, count)
 }
 
 fn part_b(input: &Input) -> Option<String> {
     let mut field = input.0.clone();
 
-    let mut checked = vec![bitvec![0; field[0].len()]; field.len()];
+    let mut visited = vec![bitvec![0; field[0].len()]; field.len()];
 
     let mut res = 0;
 
     find_num2(
         &mut field,
-        &mut checked,
+        &mut visited,
         input.1 .0 as i32,
         input.1 .1 as i32,
         input.1 .0 as i32,
@@ -269,9 +268,8 @@ mod tests {
         utils::golden("day6", &DAY, Some("41"), Some("6"), false)
     }
 
-    // #[test]
-    // fn finalanswer() {
-    //     utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-
-    // }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(6, &DAY, Some("5444"), Some("1946"), false);
+    }
 }
