@@ -1,9 +1,13 @@
+#[cfg(test)]
 use std::fs;
 
+#[cfg(test)]
 use once_cell::sync::Lazy;
 
+#[cfg(test)]
 use crate::day::Day;
 
+#[cfg(test)]
 pub fn golden<'a, Input>(
     file: &'a str,
     parent: &'a Lazy<Day<Input>>,
@@ -39,6 +43,7 @@ pub fn golden<'a, Input>(
     }
 }
 
+#[cfg(test)]
 pub fn finalanswer<'a, Input>(
     daynum: usize,
     parent: &'a Lazy<Day<Input>>,

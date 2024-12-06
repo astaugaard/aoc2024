@@ -7,7 +7,6 @@ use std::{
 use chrono::{self, FixedOffset, TimeZone, Utc};
 use clap::{Parser, Subcommand};
 
-#[cfg(not(tarpaulin_include))]
 mod day;
 
 mod day1;
@@ -69,7 +68,6 @@ enum Commands {
     },
 }
 
-#[cfg(not(tarpaulin_include))]
 fn main() {
     let args = Cli::parse();
 

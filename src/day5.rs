@@ -8,14 +8,14 @@ type Input = (Vec<(u64, u64)>, Vec<Vec<u64>>);
 fn parser(input: String, _verbose: bool) -> Result<Input, String> {
     let (b, a) = input.split_once("\n\n").unwrap();
 
-    let beforeConds = b
+    let before_conds = b
         .lines()
         .map(|line| {
             let (a, b) = line.split_once('|').unwrap();
             (a.parse::<u64>().unwrap(), b.parse::<u64>().unwrap())
         })
         .collect_vec();
-    let afterRows = a
+    let after_rows = a
         .lines()
         .map(|line| {
             line.split(',')
@@ -24,15 +24,15 @@ fn parser(input: String, _verbose: bool) -> Result<Input, String> {
         })
         .collect_vec();
 
-    Ok((beforeConds, afterRows))
+    Ok((before_conds, after_rows))
 }
 
 fn valid_edit(edit: &Vec<u64>, after: &IntTable<Vec<u64>>) -> bool {
     let mut used: IntTable<()> = IntTable::with_capacity(edit.len() * 2);
 
     for page in edit {
-        for needAfter in after.get(*page).unwrap_or(&Vec::new()) {
-            if used.contains_key(*needAfter) {
+        for need_after in after.get(*page).unwrap_or(&Vec::new()) {
+            if used.contains_key(*need_after) {
                 return false;
             }
         }

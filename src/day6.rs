@@ -13,7 +13,7 @@ fn parser(input: String, _verbose: bool) -> Result<Input, String> {
         .filter_map(|(y, line)| {
             line.chars()
                 .enumerate()
-                .filter(|(x, c)| *c == '^')
+                .filter(|(_, c)| *c == '^')
                 .next()
                 .map(|(x, _)| (x, y))
         })
@@ -116,7 +116,7 @@ fn checkloop_go(
         return false;
     }
 
-    if dirMatches(prev[y as usize][x as usize], dx, dy) {
+    if dir_matches(prev[y as usize][x as usize], dx, dy) {
         return true;
     }
 
@@ -127,7 +127,7 @@ fn checkloop_go(
     checkloop_go(field, x, y, dx, dy, prev)
 }
 
-fn dirMatches(dir: Pos, dx: i32, dy: i32) -> bool {
+fn dir_matches(dir: Pos, dx: i32, dy: i32) -> bool {
     if dy == -1 {
         dir.n
     } else if dy == 1 {
