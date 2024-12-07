@@ -331,4 +331,5 @@ mod tests {
     fn finalanswer() {
         utils::finalanswer(6, &DAY, Some("5444"), Some("1946"), false);
     }
+
 }

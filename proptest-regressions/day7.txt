@@ -1,0 +1,9 @@
+# Seeds for failure cases proptest has generated in the past. It is
+# automatically read and these particular cases re-run before any
+# novel cases are generated.
+#
+# It is recommended to check this file in to source control so that
+# everyone who runs the test benefits from these saved cases.
+cc 80d0a841e2cc59207b8aa5ea4fec37c28084c5f56742839d15caefe14e69f763 # shrinks to a = 1, b = 1
+cc c89e2245ced366f479c05a1db273b0b9e381c1a3a7eaa050eacfa68aaa2bdaa7 # shrinks to i = Some((111, [1, 1, 1], [Concat, Concat]))
+cc 9875b01effeab6c082a0896c1e13d49702e955d4782aa8bd3ddd6dd4a3d32aa2 # shrinks to i = Some((23836592086461000, [238, 100, 186, 100, 10, 693, 777], [Mult, Mult, Concat, Mult, Mult, Mult]))
