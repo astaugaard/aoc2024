@@ -1,6 +1,5 @@
 use crate::day;
 use itertools::Itertools;
-use num::CheckedMul;
 use once_cell::sync::Lazy;
 use std::cmp;
 
@@ -210,7 +209,7 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
 mod tests {
     use super::*;
     use crate::utils;
-    use itertools::Itertools;
+    
     use proptest::collection;
     use proptest::prelude::*;
 

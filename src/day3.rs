@@ -60,9 +60,9 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
 
 #[cfg(test)]
 mod tests {
-    use proptest::arbitrary;
-    use proptest::collection;
-    use proptest::prelude::*;
+    
+    
+    
 
     use super::*;
     use crate::utils;
