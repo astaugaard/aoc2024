@@ -70,7 +70,7 @@ fn part_a(input: &Input) -> Option<String> {
             sum += id * (num * i + (num * (num - 1)) / 2);
             i += num;
         } else {
-            for (id, num) in getNback(&mut input, num) {
+            for (id, num) in get_nback(&mut input, num) {
                 let num = num as usize;
                 sum += id * (num * i + (num * (num - 1)) / 2);
                 i += num;
@@ -81,7 +81,7 @@ fn part_a(input: &Input) -> Option<String> {
     Some(sum.to_string())
 }
 
-fn getNback(input: &mut VecDeque<(usize, u8, bool)>, num: usize) -> GetNBack {
+fn get_nback(input: &mut VecDeque<(usize, u8, bool)>, num: usize) -> GetNBack {
     GetNBack {
         input,
         left: num as u8,
