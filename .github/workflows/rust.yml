@@ -13,9 +13,16 @@ jobs:
     - uses: actions/checkout@v4
     - name: Build
       run: cargo build --verbose
+    - name: Setup SSH
+      uses: MrSquaare/ssh-setup-action@v1
+      with:
+          host: github.com
+          private-key: ${{ secrets.SSH_PRIVATE_KEY }}
     - name: Get inputs
       run: git clone git@github.com:astaugaard/aoc2024-inputs.git
     - name: Move inputs
       run: mv aoc2024-inputs inputs
     - name: Run tests
       run: cargo test --verbose
+    - name: remove inputs idk if needed
+      run: rm -rf inputs
