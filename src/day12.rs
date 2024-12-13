@@ -90,8 +90,8 @@ mod tests {
 
     #[test]
     fn goldens() {
-        utils::golden("day11-1", &DAY, Some("140"), None, false);
-        utils::golden("day11-2", &DAY, Some("1930"), None, false);
+        utils::golden("day12-1", &DAY, Some("140"), None, false);
+        utils::golden("day12-2", &DAY, Some("1930"), None, false);
     }
 
     //    #[test]
