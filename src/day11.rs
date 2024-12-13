@@ -80,8 +80,6 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
 
 #[cfg(test)]
 mod tests {
-    use itertools::assert_equal;
-
     use super::*;
     use crate::utils;
 
