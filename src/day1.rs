@@ -49,6 +49,10 @@ fn part_b(input: &Input) -> Option<String> {
     Some(format!("{}", res))
 }
 
+fn exe(_input: &Input) {
+    todo!()
+}
+
 pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
     // list of tests (functions that take a bool (weather to be verbose))
     // and return an Option<String>
@@ -71,6 +75,7 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
     parser: Box::new(parser),
     part_a: Box::new(part_a),
     part_b: Box::new(part_b),
+    exe: Box::new(exe),
 });
 
 #[cfg(test)]

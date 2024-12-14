@@ -2,17 +2,13 @@ use colored::Colorize;
 use core::fmt;
 use once_cell::sync::Lazy;
 use reqwest::header::USER_AGENT;
-use std::{
-    fs,
-    io::Read,
-    path::Path,
-    time::Instant,
-};
+use std::{fs, io::Read, path::Path, time::Instant};
 
 pub struct Day<A> {
     pub parser: Box<dyn Fn(String, bool) -> Result<A, String> + Sync + Send>,
     pub part_a: Box<dyn Fn(&A) -> Option<String> + Sync + Send>,
     pub part_b: Box<dyn Fn(&A) -> Option<String> + Sync + Send>,
+    pub exe: Box<dyn Fn(&A) + Sync + Send>,
 }
 
 pub struct FetchConfig {
@@ -131,9 +127,33 @@ where
     Ok(())
 }
 
-pub fn create_day<A>(day: &'static Day<A>) -> Box<dyn Fn(bool, u32) -> Result<(), String>>
+fn exe_day<A>(day: &Day<A>, number: u32) -> Result<(), String> {
+    println!(
+        "{}",
+        format!("======= Day {:2} ========", number).bright_cyan()
+    );
+
+    let file = get_day_input(number)?;
+
+    let parsed = match (*day.parser)(file, false) {
+        Ok(parsed) => parsed,
+        Err(err) => return Err(format!("failed to parse input: {}", err)),
+    };
+
+    (*day.exe)(&parsed);
+
+    Ok(())
+}
+
+pub fn create_day<A>(day: &'static Day<A>) -> Box<dyn Fn(bool, u32, bool) -> Result<(), String>>
 where
     A: fmt::Debug,
 {
-    Box::new(|verbose, num| run_day(day, verbose, num))
+    Box::new(|verbose, num, exe| {
+        if exe {
+            exe_day(day, num)
+        } else {
+            run_day(day, verbose, num)
+        }
+    })
 }

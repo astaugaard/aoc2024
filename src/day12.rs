@@ -167,11 +167,16 @@ fn score2(input: &[Vec<char>], x: usize, y: usize, visited: &mut [BitVec]) -> (u
     (area, perimiter)
 }
 
+fn exe(_input: &Input) {
+    todo!()
+}
+
 pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
     // do not touch
     parser: Box::new(parser),
     part_a: Box::new(part_a),
     part_b: Box::new(part_b),
+    exe: Box::new(exe),
 });
 
 #[cfg(test)]

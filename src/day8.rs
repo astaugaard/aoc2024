@@ -165,11 +165,16 @@ fn matching_locs(
     xs.zip(ys)
 }
 
+fn exe(_input: &Input) {
+    todo!()
+}
+
 pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
     // do not touch
     parser: Box::new(parser),
     part_a: Box::new(part_a),
     part_b: Box::new(part_b),
+    exe: Box::new(exe),
 });
 
 #[cfg(test)]

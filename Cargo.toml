@@ -10,6 +10,7 @@ bitvec = "1.0.1"
 chrono = "0.4.38"
 clap = { version = "4.5.4", features = ["derive"] }
 colored = "2.1.0"
+image = "0.25.5"
 intmap = "2.0.0"
 inttable = "0.1.0"
 itertools = "0.13.0"

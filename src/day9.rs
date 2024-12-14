@@ -143,11 +143,16 @@ fn try_alloc_free_before(free_space: &mut [(usize, u8)], num: u8, loc: usize) ->
     return None;
 }
 
+fn exe(_input: &Input) {
+    todo!()
+}
+
 pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
     // do not touch
     parser: Box::new(parser),
     part_a: Box::new(part_a),
     part_b: Box::new(part_b),
+    exe: Box::new(exe),
 });
 
 #[cfg(test)]

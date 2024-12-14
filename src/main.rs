@@ -1,8 +1,5 @@
 use colored::Colorize;
-use std::{
-    fs::File,
-    io::Write,
-};
+use std::{fs::File, io::Write};
 
 use chrono::{self, FixedOffset, TimeZone, Utc};
 use clap::{Parser, Subcommand};
@@ -56,6 +53,10 @@ enum Commands {
         #[arg(long, short)]
         day: u32,
     },
+    Exe {
+        #[arg(long, short)]
+        day: u32,
+    },
     All,
     SetFetchConfig {
         #[arg(long, short)]
@@ -72,7 +73,7 @@ enum Commands {
 fn main() {
     let args = Cli::parse();
 
-    let days: [Box<dyn Fn(bool, u32) -> Result<(), String>>; 25] = [
+    let days: [Box<dyn Fn(bool, u32, bool) -> Result<(), String>>; 25] = [
         create_day(Lazy::force(&day1::DAY)),
         create_day(Lazy::force(&day2::DAY)),
         create_day(Lazy::force(&day3::DAY)),
@@ -109,7 +110,7 @@ fn main() {
 
     match args.command {
         Commands::Day { day } => {
-            match (*days[(day - 1) as usize])(args.verbose, day) {
+            match (*days[(day - 1) as usize])(args.verbose, day, false) {
                 Ok(()) => {}
                 Err(err) => {
                     println!("{}", format!("error: {err}").red())
@@ -120,7 +121,7 @@ fn main() {
             let current_time = Utc::now();
             // let fetch_config = get_fetch_config();
             for (day, dayfun) in days.iter().enumerate() {
-                let day = day+1;
+                let day = day + 1;
                 let runday = match Lazy::force(&FETCH_CONFIG) {
                     Some(conf) => {
                         let release_time = FixedOffset::west_opt(5 * 60 * 60)
@@ -140,7 +141,7 @@ fn main() {
                 };
 
                 if runday {
-                    match (*dayfun)(args.verbose, day as u32) {
+                    match (*dayfun)(args.verbose, day as u32, false) {
                         Ok(()) => {}
                         Err(err) => {
                             println!("{}", format!("error: {err}").red())
@@ -158,9 +159,16 @@ fn main() {
             file.write_all(format!("{agent}\n{oauthkey}\n{year}").as_bytes())
                 .unwrap();
         }
+        Commands::Exe { day } => {
+            match (*days[(day - 1) as usize])(args.verbose, day, true) {
+                Ok(()) => {}
+                Err(err) => {
+                    println!("{}", format!("error: {err}").red())
+                }
+            };
+        }
     }
 }
-
 
 // let client = reqwest::Client::new();
 //                     let res = match client
