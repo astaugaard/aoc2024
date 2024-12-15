@@ -82,7 +82,7 @@ fn run_steps(input: &Input, sx: i32, sy: i32, steps: i32) {
     img.save(format!("/home/a/day14result/{steps}.png")).unwrap();
 }
 
-fn part_b(input: &Input) -> Option<String> {
+fn part_b(_input: &Input) -> Option<String> {
     None
 }
 
