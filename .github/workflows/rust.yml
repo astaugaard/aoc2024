@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     - name: Build
-      run: cargo build --verbose
+      run: cargo build --verbose --release
     - name: Setup SSH
       uses: MrSquaare/ssh-setup-action@v1
       with:
@@ -23,6 +23,6 @@ jobs:
     - name: Move inputs
       run: mv aoc2024-inputs inputs
     - name: Run tests
-      run: cargo test --verbose
+      run: cargo test --verbose --release
     - name: remove inputs idk if needed
       run: rm -rf inputs
