@@ -2,9 +2,16 @@ use once_cell::sync::Lazy;
 
 use crate::day;
 
-type Input = ();
+enum Loc {
+    Start,
+    End,
+    Empty,
+    Wall
+}
 
-fn parser(_input: String, _verbose: bool) -> Result<Input, String> {
+type Input = Vec<Vec<Loc>>;
+
+fn parser(input: String, _verbose: bool) -> Result<Input, String> {
     Ok(())
 }
 

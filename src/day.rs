@@ -85,7 +85,7 @@ where
 {
     println!(
         "{}",
-        format!("======= Day {:2} ========", number).bright_cyan()
+        format!("======= Day {:2} ========", number).bright_red()
     );
 
     // let file = fs::read_to_string(format!("inputs/day{}", number)).map_err(|e| format!("{e}"))?;
@@ -130,7 +130,7 @@ where
 fn exe_day<A>(day: &Day<A>, number: u32) -> Result<(), String> {
     println!(
         "{}",
-        format!("======= Day {:2} ========", number).bright_cyan()
+        format!("======= Day {:2} ========", number).bright_red()
     );
 
     let file = get_day_input(number)?;
