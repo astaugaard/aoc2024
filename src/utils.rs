@@ -27,16 +27,15 @@ pub fn golden<'a, Input>(
         Err(err) => panic!("golden {} failed to parse: {}", file, err),
     };
 
-    let part_a = (*parent.part_a)(&input);
-    let part_b = (*parent.part_b)(&input);
-
     if let Some(_a) = expected_a {
+        let part_a = (*parent.part_a)(&input);
         if expected_a != part_a.as_deref() {
             panic!("golden {} expected {:?} got {:?}", file, expected_a, part_a);
         }
     }
 
     if let Some(_a) = expected_b {
+        let part_b = (*parent.part_b)(&input);
         if expected_b != part_b.as_deref() {
             panic!("golden {} expected {:?} got {:?}", file, expected_b, part_b);
         }
@@ -94,7 +93,7 @@ pub fn finalanswer<'a, Input>(
 #[cfg(test)]
 pub fn set_function<'a, Input>(
     file: &'a str,
-    parser: &dyn Fn(String, bool) -> Result<Input,String>,
+    parser: &dyn Fn(String, bool) -> Result<Input, String>,
     function: &dyn Fn(&Input) -> String,
     expected: &'a str,
     verbose: bool,

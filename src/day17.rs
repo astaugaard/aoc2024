@@ -106,17 +106,96 @@ fn simulate(mut loc: usize, input: &mut Input) -> Vec<u8> {
     res
 }
 
+fn simulate_till_out(mut loc: usize, input: &mut Input) -> u8 {
+    while loc < (input.program.len() - 1) {
+        let opcode = input.program[loc];
+        let operand = input.program[loc + 1];
+
+        match opcode {
+            0 => {
+                let operand = input.combo(operand);
+                input.a = input.a >> operand;
+                loc += 2;
+            }
+            1 => {
+                input.b = input.b ^ operand as usize;
+                loc += 2;
+            }
+            2 => {
+                let operand = input.combo(operand);
+                input.b = operand % 8;
+                loc += 2
+            }
+            3 => {
+                if input.a == 0 {
+                    loc += 2
+                } else {
+                    loc = operand as usize;
+                }
+            }
+            4 => {
+                input.b = input.b ^ input.c;
+                loc += 2;
+            }
+            5 => {
+                let operand = input.combo(operand);
+                return ((operand % 8) as u8);
+            }
+            6 => {
+                let operand = input.combo(operand);
+                input.b = input.a >> operand;
+                loc += 2;
+            }
+            7 => {
+                let operand = input.combo(operand);
+                input.c = input.a >> operand;
+                loc += 2;
+            }
+            _ => panic!("invalid number for opcode"),
+        }
+    }
+
+    panic!("no out")
+}
+
 fn part_b(input: &Input) -> Option<String> {
-    let loc = 0;
+    // specialized to my input
+    // assumes a is only divede by 8 during the course of the program before looping
+    // also assumes that the program only loops at the end
 
-    for a in 0.. {
-        let mut input = input.clone();
-        input.a = a;
+    let a = search(input.program.len() - 1, 0, input).unwrap();
 
-        let res = simulate(loc, &mut input);
+    //    for i in input.program.iter().rev() {
+    //        println!("a before shift {a}");
+    //        a <<= 3;
+    //        println!("a after shift {a}");
+    //        for p in 0..8usize {
+    //            let mut input = input.clone();
+    //            input.a = dbg!(p + a);
+    //            if *i == simulate_till_out(0, &mut input) {
+    //                println!("a before add: {a}");
+    //                a += dbg!(p);
+    //                println!("a after add: {a}");
+    //                println!("hello");
+    ////                break;
+    //            }
+    //        }
+    //        println!("done loop")
+    //    }
 
-        if res == input.program {
-            return Some(a.to_string());
+    Some(a.to_string())
+}
+
+fn search(i: usize, a: usize, input: &Input) -> Option<usize> {
+    for p in 0..8usize {
+        let mut input2 = input.clone();
+        input2.a = (a << 3) + p;
+        if input.program[i] == simulate_till_out(0, &mut input2) {
+            if i == 0 {
+                return Some((a << 3) + p);
+            } else if let Some(val) = search(i - 1, (a << 3) + p, input) {
+                return Some(val);
+            }
         }
     }
 
@@ -144,7 +223,7 @@ pub static DAY: Lazy<day::Day<Input>> = Lazy::new(|| day::Day {
 // B = A % 8
 // B = B ^ 7
 // C = A / B
-// A = A / 3
+// A = A / 8
 // B = B ^ C
 // B = B ^ 7
 // output (B % 8)
@@ -164,8 +243,8 @@ mod tests {
         utils::golden("day17-2", &DAY, None, Some("117440"), false);
     }
 
-    // #[test]
-    // fn finalanswer() {
-    // utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-    // }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(17, &DAY, Some("2,1,0,1,7,2,5,0,3"), Some("267265166222235"), false);
+    }
 }
