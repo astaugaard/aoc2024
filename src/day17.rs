@@ -139,7 +139,7 @@ fn simulate_till_out(mut loc: usize, input: &mut Input) -> u8 {
             }
             5 => {
                 let operand = input.combo(operand);
-                return ((operand % 8) as u8);
+                return (operand % 8) as u8;
             }
             6 => {
                 let operand = input.combo(operand);
