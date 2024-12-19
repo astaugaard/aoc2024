@@ -198,7 +198,7 @@ fn count_num_locs(
 
     if (0..4).all(|f| !visited[loc.1 as usize][f][loc.0 as usize]) {
         *count += 1;
-        println!("loc: {:?}", loc);
+        // println!("loc: {:?}", loc);
     }
 
     visited[loc.1 as usize][facing].set(loc.0 as usize, true);
