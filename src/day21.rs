@@ -1,9 +1,9 @@
 use crate::day;
-use bumpalo::Bump;
 use itertools::{chain, repeat_n, Itertools};
 use once_cell::sync::Lazy;
 use std::cmp;
 use std::collections::HashMap;
+use typed_arena::Arena;
 
 type Input = Vec<String>;
 
@@ -222,8 +222,9 @@ impl FinalKeyPad {
 }
 
 fn part_a(input: &Input) -> Option<String> {
-    let bump = Bump::new();
-    let mut keypad = make_key_pad(2, &bump);
+    let bump = Arena::new();
+    let mut keypad = FinalKeyPad::new();
+    let mut keypad = make_key_pad(2, &mut keypad, &bump);
 
     Some(
         input
@@ -234,8 +235,8 @@ fn part_a(input: &Input) -> Option<String> {
     )
 }
 
-fn make_key_pad(num: usize, bump: &Bump) -> NumPad {
-    let mut current: &mut dyn KeyPadTrait = bump.alloc(FinalKeyPad::new());
+fn make_key_pad<'a>(num: usize, f: &'a mut FinalKeyPad, bump: &'a Arena<KeyPad<'a>>) -> NumPad<'a> {
+    let mut current: &mut dyn KeyPadTrait = f;
 
     for i in 0..num {
         current = bump.alloc(KeyPad::new(current));
@@ -245,8 +246,9 @@ fn make_key_pad(num: usize, bump: &Bump) -> NumPad {
 }
 
 fn part_b(input: &Input) -> Option<String> {
-    let bump = Bump::new();
-    let mut keypad = make_key_pad(25, &bump);
+    let bump = Arena::new();
+    let mut keypad = FinalKeyPad::new();
+    let mut keypad = make_key_pad(25, &mut keypad, &bump);
 
     Some(
         input
@@ -287,15 +289,18 @@ mod tests {
 
     #[test]
     fn t029a() {
-        let bump = Bump::new();
-        let mut keypad = make_key_pad(2, &bump);
+        let bump = Arena::new();
+        let mut keypad = FinalKeyPad::new();
+        let mut keypad = make_key_pad(2, &mut keypad, &bump);
+
         assert_eq!(keypad.num_dist("029A"), 68)
     }
 
     #[test]
     fn t029a25() {
-        let bump = Bump::new();
-        let mut keypad = make_key_pad(25, &bump);
+        let bump = Arena::new();
+        let mut keypad = FinalKeyPad::new();
+        let mut keypad = make_key_pad(25, &mut keypad, &bump);
 
         assert_eq!(keypad.num_dist("029A"), 82050061710)
     }
