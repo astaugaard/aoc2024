@@ -106,6 +106,7 @@ name = "aoc2021"
 version = "0.1.0"
 dependencies = [
  "bitvec",
+ "bumpalo",
  "chrono",
  "clap",
  "colored",
