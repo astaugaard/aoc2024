@@ -106,7 +106,7 @@ fn main() {
     // println!("threads: {}", default_parallelism_approx);
     //
     rayon::ThreadPoolBuilder::new().build_global().unwrap();
-    std::thread::sleep(time::Duration::from_millis(10));
+    // std::thread::sleep(time::Duration::from_millis(10));
 
     match args.command {
         Commands::Day { day } => {

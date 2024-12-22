@@ -127,7 +127,7 @@ fn path_exist(locs: &[BitVec]) -> bool {
 fn part_b_with(max: usize, input: &Input) -> String {
     let mut locs = vec![bitvec![0; max + 1]; max + 1];
 
-    for (i, (x, y)) in input.iter().enumerate() {
+    for (_, (x, y)) in input.iter().enumerate() {
         locs[*y].set(*x, true);
         if !path_exist(&locs) {
             return format!("{x},{y}");

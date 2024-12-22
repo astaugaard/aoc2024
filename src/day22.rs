@@ -1,6 +1,10 @@
 use crate::day;
+use intmap::IntMap;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
+use rayon::iter::IntoParallelRefIterator;
+use rayon::iter::ParallelBridge;
+use rayon::iter::ParallelIterator;
 use std::collections::{HashMap, HashSet};
 
 type Input = Vec<u64>;
@@ -54,8 +58,17 @@ impl Iterator for Trader {
     }
 }
 
-fn add_num(num: u64, map: &mut HashMap<(i8, i8, i8, i8), u64>) {
-    let mut visited: HashSet<(i8, i8, i8, i8)> = HashSet::new();
+fn convert_to_key(a: i8, b: i8, c: i8, d: i8) -> u64 {
+    let a = a as u8 as u64;
+    let b = (b as u8 as u64) << 8;
+    let c = (c as u8 as u64) << 16;
+    let d = (d as u8 as u64) << 24;
+
+    a + b + c + d
+}
+
+fn add_num(num: u64, map: &mut IntMap<u64>) {
+    let mut visited: IntMap<()> = IntMap::new();
 
     for ((a, _), (b, _), (c, _), (d, val)) in (Trader { secret: num })
         .take(2000)
@@ -64,23 +77,46 @@ fn add_num(num: u64, map: &mut HashMap<(i8, i8, i8, i8), u64>) {
         .map(|(a, b)| ((b as i8 - a as i8), b % 10))
         .tuple_windows()
     {
-        if visited.contains(&(a, b, c, d)) {
+        if visited.contains_key(convert_to_key(a, b, c, d)) {
             continue;
         }
 
-        *map.entry((a, b, c, d)).or_insert(0) += val;
-        visited.insert((a, b, c, d));
+        match map.get_mut(convert_to_key(a, b, c, d)) {
+            Some(loc) => *loc += val,
+            None => {
+                map.insert(convert_to_key(a, b, c, d), val);
+            }
+        };
+
+        // *map.entry().or_insert(0) += val;
+        visited.insert(convert_to_key(a, b, c, d), ());
     }
 }
 
 fn part_b(input: &Input) -> Option<String> {
-    let mut map: HashMap<(i8, i8, i8, i8), u64> = HashMap::new();
+    let map = input
+        .par_iter()
+        .map(|num| {
+            let mut map: IntMap<u64> = IntMap::new();
+            add_num(*num, &mut map);
+            map
+        })
+        .reduce(
+            || IntMap::new(),
+            |mut m1, m2| {
+                for (k, v) in m2.into_iter() {
+                    match m1.get_mut(k) {
+                        Some(loc) => *loc += v,
+                        None => {
+                            m1.insert(k, v);
+                        }
+                    }
+                }
+                m1
+            },
+        );
 
-    for num in input {
-        add_num(*num, &mut map);
-    }
-
-    Some(map.into_values().max().unwrap().to_string())
+    Some(map.values().max().unwrap().to_string())
 }
 
 fn exe(_input: &Input) {
@@ -111,8 +147,8 @@ mod tests {
         assert_eq!(sim_step(123), 15887950);
     }
 
-    // #[test]
-    // fn finalanswer() {
-    //     utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-    // }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(22, &DAY, Some("20506453102"), Some("2423"), false);
+    }
 }
