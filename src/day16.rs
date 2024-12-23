@@ -1,6 +1,7 @@
 use crate::day;
 use bitvec::bitvec;
 use bitvec::vec::BitVec;
+use bitvec::view::BitViewSized;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use std::cmp::Reverse;
@@ -149,12 +150,23 @@ fn pathfindb(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
 
     queue.push((Reverse(0), (1, 0), start_loc));
 
+    let mut dist = 0;
+
     while let Some((Reverse(prio), facing, loc)) = queue.pop() {
         if loc == end_loc {
+            dist = prio;
             break;
         }
 
+        // if loc == (23, 3) {
+        //     println!("visit");
+        // }
+
         let d = current_lowest[loc.1 as usize][loc.0 as usize][dirtoind(facing)].0;
+
+        // if loc == (37, 11) {
+        //     println!("visit 2 d: {d}");
+        // }
 
         for (ndir, nloc) in [(-1, 0), (1, 0), (0, 1), (0, -1)]
             .into_iter()
@@ -163,10 +175,23 @@ fn pathfindb(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
         {
             let nd = if facing == ndir { 1 + d } else { 1001 + d };
             if nd < current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)].0 {
+                // if loc == (37, 11) {
+                //     println!("setting: {:?}, {:?}", nloc, nd);
+                // }
+                // if nloc == (38, 11) {
+                //     println!("resetting loc, {:?}, {}", nd, dirtoind(ndir));
+                // }
+                // if nloc == (39, 11) {
+                //     println!("resetting loc2, {:?}, {}, from {:?}, {}", nd, dirtoind(ndir), loc, dirtoind(facing));
+                // }
                 current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)] =
                     (nd, vec![(loc, dirtoind(facing))]);
                 queue.push((Reverse(nd), ndir, nloc));
+
             } else if nd == current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)].0 {
+                // if nloc == (38, 11) {
+                //     println!("adding: {:?}, {:?} from", loc, nd);
+                // }
                 current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)]
                     .1
                     .push((loc, dirtoind(facing)));
@@ -174,13 +199,38 @@ fn pathfindb(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
         }
     }
 
+    // println!(
+    //     "dist at location: {}",
+    //     current_lowest
+    //         .get(12)
+    //         .map_or(0, |row| row.get(37).map_or(0, |f| f[dirtoind((1, 0))].0))
+    // );
+
     let mut count = 0;
     let mut visited = vec![vec![bitvec![0; input[0].len()]; 4]; input.len()];
 
-    count_num_locs(&mut visited, &mut count, &current_lowest, end_loc, 0);
-    count_num_locs(&mut visited, &mut count, &current_lowest, end_loc, 1);
-    count_num_locs(&mut visited, &mut count, &current_lowest, end_loc, 2);
-    count_num_locs(&mut visited, &mut count, &current_lowest, end_loc, 3);
+    for facing in 0..4 {
+        if current_lowest[end_loc.1 as usize][end_loc.0 as usize][facing].0 > dist {
+            continue;
+        }
+        count_num_locs(&mut visited, &mut count, &current_lowest, end_loc, facing);
+    }
+
+    // for line in visited {
+    //     println!(
+    //         "{}",
+    //         (0..line[0].len())
+    //             .map(|x| {
+    //                 if (0..4).all(|f| !line[f][x]) {
+    //                     '.'
+    //                 } else {
+    //                     'X'
+    //                 }
+    //             })
+    //             .collect::<String>()
+    //     )
+    //     // line.iter().map(|a| (0..4).all(|f| )
+    // }
 
     count
 }
@@ -232,6 +282,7 @@ mod tests {
     fn goldens() {
         utils::golden("day16-1", &DAY, Some("7036"), Some("45"), false);
         utils::golden("day16-2", &DAY, Some("11048"), Some("64"), false);
+        // utils::golden("day16-3", &DAY, Some("5078"), Some("413"), false);
     }
 
     // #[test]

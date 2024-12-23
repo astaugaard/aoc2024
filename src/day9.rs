@@ -1,4 +1,4 @@
-use std::collections::{VecDeque};
+use std::collections::VecDeque;
 
 use crate::day;
 use itertools::Itertools;
@@ -126,7 +126,7 @@ fn part_b(input: &Input) -> Option<String> {
 }
 
 fn try_alloc_free_before(free_space: &mut [(usize, u8)], num: u8, loc: usize) -> Option<usize> {
-    for (floc,fnum) in free_space.iter_mut() {
+    for (floc, fnum) in free_space.iter_mut() {
         if *floc >= loc {
             return None;
         }
@@ -137,7 +137,7 @@ fn try_alloc_free_before(free_space: &mut [(usize, u8)], num: u8, loc: usize) ->
             *floc += num as usize;
 
             return Some(loc);
-        } 
+        }
     }
 
     return None;
@@ -165,8 +165,13 @@ mod tests {
         utils::golden("day9", &DAY, Some("1928"), Some("2858"), false)
     }
 
+    // #[test]
+    // fn evil_input() {
+    //     utils::golden("day9-evil", &DAY, None, Some("5799706413896802"), false);
+    // }
+
     #[test]
     fn finalanswer() {
-    	utils::finalanswer(9, &DAY, Some("6367087064415"), Some("6390781891880"), false);
+        utils::finalanswer(9, &DAY, Some("6367087064415"), Some("6390781891880"), false);
     }
 }
