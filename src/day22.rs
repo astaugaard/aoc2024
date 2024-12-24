@@ -3,9 +3,7 @@ use intmap::IntMap;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use rayon::iter::IntoParallelRefIterator;
-use rayon::iter::ParallelBridge;
 use rayon::iter::ParallelIterator;
-use std::collections::{HashMap, HashSet};
 
 type Input = Vec<u64>;
 

@@ -111,12 +111,6 @@ enum CircutLoc {
     XOr2(usize),
 }
 
-#[derive(Eq, PartialEq, Hash, Debug)]
-enum OutputLoc {
-    Circut(CircutLoc),
-    Output(usize),
-}
-
 #[derive(Eq, PartialEq, Hash, Debug, Copy, Clone)]
 enum Origin {
     CircutLoc(CircutLoc),
@@ -381,7 +375,7 @@ fn expected_circut_loc_i(a: Origin) -> Vec<CircutLoc> {
             CircutLoc::AND2(u) => vec![CircutLoc::Or(u)],
             CircutLoc::Or(u) => vec![CircutLoc::XOr2(u + 1), CircutLoc::AND2(u + 1)],
             CircutLoc::XOr1(u) => vec![CircutLoc::XOr2(u), CircutLoc::AND2(u)],
-            CircutLoc::XOr2(u) => vec![],
+            CircutLoc::XOr2(_) => vec![],
         },
         Origin::Input(n) if n == 0 => vec![CircutLoc::HalfAnd, CircutLoc::HalfXOr],
         Origin::Input(n) => vec![CircutLoc::XOr1(n), CircutLoc::AND1(n)],
@@ -441,6 +435,12 @@ mod tests {
 
     #[test]
     fn finalanswer() {
-        utils::finalanswer(24, &DAY, Some("57344080719736"), Some("cgq,fnr,kqk,nbc,svm,z15,z23,z39"), false);
+        utils::finalanswer(
+            24,
+            &DAY,
+            Some("57344080719736"),
+            Some("cgq,fnr,kqk,nbc,svm,z15,z23,z39"),
+            false,
+        );
     }
 }

@@ -238,7 +238,7 @@ fn part_a(input: &Input) -> Option<String> {
 fn make_key_pad<'a>(num: usize, f: &'a mut FinalKeyPad, bump: &'a Arena<KeyPad<'a>>) -> NumPad<'a> {
     let mut current: &mut dyn KeyPadTrait = f;
 
-    for i in 0..num {
+    for _ in 0..num {
         current = bump.alloc(KeyPad::new(current));
     }
 

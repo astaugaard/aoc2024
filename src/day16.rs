@@ -1,7 +1,6 @@
 use crate::day;
 use bitvec::bitvec;
 use bitvec::vec::BitVec;
-use bitvec::view::BitViewSized;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use std::cmp::Reverse;
@@ -35,7 +34,7 @@ fn parser(input: String, _verbose: bool) -> Result<Input, String> {
 }
 
 fn part_a(input: &Input) -> Option<String> {
-    let startLoc = input
+    let start_loc = input
         .iter()
         .enumerate()
         .filter_map(|(row, line)| {
@@ -50,7 +49,7 @@ fn part_a(input: &Input) -> Option<String> {
         .next()
         .unwrap();
 
-    let endLoc = input
+    let end_loc = input
         .iter()
         .enumerate()
         .filter_map(|(row, line)| {
@@ -65,13 +64,14 @@ fn part_a(input: &Input) -> Option<String> {
         .next()
         .unwrap();
 
-    let distance = pathfind(startLoc, endLoc, input);
+    let distance = pathfind(start_loc, end_loc, input);
 
     Some(distance.to_string())
 }
 
 fn dirtoind(dir: (i32, i32)) -> usize {
-    ((dir.0 + 1) / 2 + dir.1 + 2) as usize
+    (((dir.0 + 1) / 2) + if dir.1 == 0 { 0 } else { (dir.1 + 1) / 2 + 2 }) as usize
+    // ((dir.0 + 1) / 2 + (dir.1 + 5) / 2) as usize
 }
 
 fn pathfind(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
@@ -82,7 +82,7 @@ fn pathfind(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
 
     queue.push((Reverse(0), (1, 0), start_loc));
 
-    while let Some((Reverse(prio), facing, loc)) = queue.pop() {
+    while let Some((_, facing, loc)) = queue.pop() {
         if loc == end_loc {
             return current_lowest[end_loc.1 as usize][end_loc.0 as usize][dirtoind(facing)];
         }
@@ -106,7 +106,7 @@ fn pathfind(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
 }
 
 fn part_b(input: &Input) -> Option<String> {
-    let startLoc = input
+    let start_loc = input
         .iter()
         .enumerate()
         .filter_map(|(row, line)| {
@@ -121,7 +121,7 @@ fn part_b(input: &Input) -> Option<String> {
         .next()
         .unwrap();
 
-    let endLoc = input
+    let end_loc = input
         .iter()
         .enumerate()
         .filter_map(|(row, line)| {
@@ -136,7 +136,7 @@ fn part_b(input: &Input) -> Option<String> {
         .next()
         .unwrap();
 
-    let distance = pathfindb(startLoc, endLoc, input);
+    let distance = pathfindb(start_loc, end_loc, input);
 
     Some(distance.to_string())
 }
@@ -158,15 +158,7 @@ fn pathfindb(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
             break;
         }
 
-        // if loc == (23, 3) {
-        //     println!("visit");
-        // }
-
         let d = current_lowest[loc.1 as usize][loc.0 as usize][dirtoind(facing)].0;
-
-        // if loc == (37, 11) {
-        //     println!("visit 2 d: {d}");
-        // }
 
         for (ndir, nloc) in [(-1, 0), (1, 0), (0, 1), (0, -1)]
             .into_iter()
@@ -175,23 +167,10 @@ fn pathfindb(start_loc: (i32, i32), end_loc: (i32, i32), input: &Input) -> u32 {
         {
             let nd = if facing == ndir { 1 + d } else { 1001 + d };
             if nd < current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)].0 {
-                // if loc == (37, 11) {
-                //     println!("setting: {:?}, {:?}", nloc, nd);
-                // }
-                // if nloc == (38, 11) {
-                //     println!("resetting loc, {:?}, {}", nd, dirtoind(ndir));
-                // }
-                // if nloc == (39, 11) {
-                //     println!("resetting loc2, {:?}, {}, from {:?}, {}", nd, dirtoind(ndir), loc, dirtoind(facing));
-                // }
                 current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)] =
                     (nd, vec![(loc, dirtoind(facing))]);
                 queue.push((Reverse(nd), ndir, nloc));
-
             } else if nd == current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)].0 {
-                // if nloc == (38, 11) {
-                //     println!("adding: {:?}, {:?} from", loc, nd);
-                // }
                 current_lowest[nloc.1 as usize][nloc.0 as usize][dirtoind(ndir)]
                     .1
                     .push((loc, dirtoind(facing)));
@@ -282,11 +261,20 @@ mod tests {
     fn goldens() {
         utils::golden("day16-1", &DAY, Some("7036"), Some("45"), false);
         utils::golden("day16-2", &DAY, Some("11048"), Some("64"), false);
-        // utils::golden("day16-3", &DAY, Some("5078"), Some("413"), false);
+        utils::golden("day16-3", &DAY, Some("5078"), Some("413"), false);
+        utils::golden("day16-4", &DAY, Some("4006"), Some("8"), false);
     }
 
-    // #[test]
-    // fn finalanswer() {
-    //     utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-    // }
+    #[test]
+    fn dirtoind_tests() {
+        assert_eq!(dirtoind((1, 0)), 1);
+        assert_eq!(dirtoind((-1, 0)), 0);
+        assert_eq!(dirtoind((0, 1)), 3);
+        assert_eq!(dirtoind((0, -1)), 2);
+    }
+
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(16, &DAY, Some("95444"), Some("513"), false);
+    }
 }

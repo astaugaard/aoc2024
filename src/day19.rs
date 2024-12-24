@@ -1,7 +1,6 @@
 use crate::day;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
-use proptest::bits::BitSetLike;
 use regex::Regex;
 
 type Input = (Vec<String>, Vec<String>);

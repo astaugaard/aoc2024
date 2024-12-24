@@ -98,7 +98,7 @@ fn path_exist(locs: &[BitVec]) -> bool {
 
     queue.push((0, (0, 0)));
 
-    while let Some((prio, loc)) = queue.pop() {
+    while let Some((_, loc)) = queue.pop() {
         if loc.0 as usize == locs.len() - 1 && loc.1 as usize == locs.len() - 1 {
             return true;
         }
