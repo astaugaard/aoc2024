@@ -136,28 +136,20 @@ fn part_b(input: &Input) -> Option<String> {
         waiting_on.entry(&c).or_insert(Vec::new()).push(id);
 
         if c == "z45" {
-            assert!(vals
-                .insert(c, Origin::CircutLoc(CircutLoc::Or(44)))
-                .is_none());
+            vals.insert(c, Origin::CircutLoc(CircutLoc::Or(44)));
             to_update.push(c);
         } else if c == "z00" {
-            assert!(vals
-                .insert(c, Origin::CircutLoc(CircutLoc::HalfXOr))
-                .is_none());
+            vals.insert(c, Origin::CircutLoc(CircutLoc::HalfXOr));
             to_update.push(c);
         } else if c.chars().next().unwrap() == 'z' {
             let l = c[1..].parse::<usize>().unwrap();
-            assert!(vals
-                .insert(c, Origin::CircutLoc(CircutLoc::XOr2(l)))
-                .is_none());
+            vals.insert(c, Origin::CircutLoc(CircutLoc::XOr2(l)));
             to_update.push(c);
         }
     }
 
     for (id, s) in input.0.iter() {
-        if let Some(a) = vals.insert(id, Origin::Input(id[1..].parse::<usize>().unwrap())) {
-            assert_eq!(a, Origin::Input(id[1..].parse::<usize>().unwrap()));
-        };
+        vals.insert(id, Origin::Input(id[1..].parse::<usize>().unwrap()));
         update_waitingb(&input.1, &waiting_on, &mut vals, id, &mut bad_wires);
     }
 
@@ -184,7 +176,7 @@ fn update_waitingb<'a>(
     };
 
     for rule in a {
-        let (an, op, bn, cn) = dbg!(&input[*rule]);
+        let (an, op, bn, cn) = &input[*rule];
 
         match (
             vals.get(an.as_str()),
@@ -207,23 +199,8 @@ fn update_waitingb<'a>(
                 let locs = ea.intersection(&eb).collect_vec();
 
                 if locs.len() == 1 {
-                    dbg!(&ea);
-                    dbg!(&eb);
-                    println!(
-                        "propogating {:?} at {} from {:?} and {:?}",
-                        Origin::CircutLoc(**locs[0]),
-                        cn,
-                        a,
-                        b
-                    );
-                    assert!(vals.insert(cn, Origin::CircutLoc(**locs[0])).is_none());
+                    vals.insert(cn, Origin::CircutLoc(**locs[0])).is_none();
                     update_waitingb(input, waiting_on, vals, cn, bad_wires);
-                } else {
-                    dbg!(ea);
-                    dbg!(a);
-                    dbg!(eb);
-                    dbg!(b);
-                    println!("not enough info?");
                 }
             }
             (Some(a), None, Some(c)) => {
@@ -238,34 +215,16 @@ fn update_waitingb<'a>(
                 let possible_locs_a = ea.iter().collect_vec();
 
                 if expected_type != gate_type(ec) {
-                    println!("wrong gate type L: {}", cn);
                     bad_wires.insert(cn.as_str());
                     if possible_locs_a.len() == 1 {
-                        println!(
-                            "propogating {:?} at {} from {:?} and gate {:?}",
-                            other_input(**possible_locs_a[0], *a),
-                            bn,
-                            a,
-                            op
-                        );
-                        assert!(vals
-                            .insert(bn, other_input(**possible_locs_a[0], *a))
-                            .is_none());
+                        vals.insert(bn, other_input(**possible_locs_a[0], *a));
                         update_waitingb(input, waiting_on, vals, bn, bad_wires);
                     } else if possible_locs_a.len() == 0 {
                         panic!("both bad not allowed :(")
                     }
                 } else {
                     if ea.contains(&ec) {
-                        println!(
-                            "propogating {:?} at {} from {:?} and gate {:?} and output: {:?}: 2",
-                            other_input(ec, *a),
-                            bn,
-                            a,
-                            op,
-                            c
-                        );
-                        assert!(vals.insert(bn, other_input(ec, *a)).is_none());
+                        vals.insert(bn, other_input(ec, *a));
                         update_waitingb(input, waiting_on, vals, bn, bad_wires);
                     }
                 }
@@ -283,27 +242,16 @@ fn update_waitingb<'a>(
                 let possible_locs_b = eb.iter().collect_vec();
 
                 if expected_type != gate_type(ec) {
-                    println!("unexpected gate output: {}", cn);
                     bad_wires.insert(cn.as_str());
                     if possible_locs_b.len() == 1 {
-                        assert!(vals
-                            .insert(an, other_input(**possible_locs_b[0], *b))
-                            .is_none());
+                        vals.insert(an, other_input(**possible_locs_b[0], *b));
                         update_waitingb(input, waiting_on, vals, an, bad_wires);
                     } else if possible_locs_b.len() == 0 {
                         panic!("both bad not allowed :(")
                     }
                 } else {
                     if eb.contains(&ec) {
-                        println!(
-                            "propogating {:?} at {} from {:?} and gate {:?} and output: {:?}: 3",
-                            other_input(ec, *b),
-                            an,
-                            b,
-                            op,
-                            c
-                        );
-                        assert!(vals.insert(an, other_input(ec, *b)).is_none());
+                        vals.insert(an, other_input(ec, *b));
                         update_waitingb(input, waiting_on, vals, an, bad_wires);
                     }
                 }
@@ -327,20 +275,11 @@ fn update_waitingb<'a>(
                     if eb.contains(&ec) {
                         continue; // don't need to do anything
                     } else {
-                        println!("no match :( 2: {}", bn);
                         bad_wires.insert(bn);
                     }
                 } else if eb.contains(&ec) {
-                    println!("no match :( 3: {}", an);
                     bad_wires.insert(an);
                 } else {
-                    dbg!(a);
-                    dbg!(ea);
-                    dbg!(b);
-                    dbg!(eb);
-                    dbg!(c);
-                    dbg!(ec);
-                    println!("adding output line: {}", cn);
                     bad_wires.insert(cn);
                 }
             }
@@ -350,10 +289,6 @@ fn update_waitingb<'a>(
                 let posible_locs_a = ea.iter().filter(|g| gate_type(**g) == *op).collect_vec();
 
                 if posible_locs_a.len() == 0 {
-                    dbg!(a);
-                    dbg!(ea);
-                    dbg!(op);
-                    println!("no match :(: {}", an);
                     bad_wires.insert(an);
                 }
             }
@@ -362,10 +297,6 @@ fn update_waitingb<'a>(
                 let posible_locs_b = eb.iter().filter(|g| gate_type(**g) == *op).collect_vec();
 
                 if posible_locs_b.len() == 0 {
-                    dbg!(b);
-                    dbg!(eb);
-                    dbg!(op);
-                    println!("no match :(: {} 4", an);
                     bad_wires.insert(bn);
                 }
             }
@@ -374,10 +305,6 @@ fn update_waitingb<'a>(
                 let ec = expected_circut_loc_o(*c);
 
                 if *op != gate_type(ec) {
-                    dbg!(op);
-                    dbg!(ec);
-                    dbg!(c);
-                    println!("bad gate type 2: {}", cn);
                     bad_wires.insert(cn);
                 }
             }
@@ -513,8 +440,8 @@ mod tests {
         utils::golden("day24-2", &DAY, Some("2024"), None, false);
     }
 
-    // #[test]
-    // fn finalanswer() {
-    //     utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-    // }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(24, &DAY, Some("57344080719736"), Some("cgq,fnr,kqk,nbc,svm,z15,z23,z39"), false);
+    }
 }
