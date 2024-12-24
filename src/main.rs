@@ -3,7 +3,6 @@ use std::{fs::File, io::Write};
 
 use chrono::{self, FixedOffset, TimeZone, Utc};
 use clap::{Parser, Subcommand};
-use std::time;
 
 mod day;
 

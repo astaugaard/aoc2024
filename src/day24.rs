@@ -1,5 +1,4 @@
 use crate::day;
-use chrono::format::format;
 use itertools::Itertools;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
@@ -148,7 +147,7 @@ fn part_b(input: &Input) -> Option<String> {
         }
     }
 
-    for (id, s) in input.0.iter() {
+    for (id, _) in input.0.iter() {
         vals.insert(id, Origin::Input(id[1..].parse::<usize>().unwrap()));
         update_waitingb(&input.1, &waiting_on, &mut vals, id, &mut bad_wires);
     }
@@ -199,7 +198,7 @@ fn update_waitingb<'a>(
                 let locs = ea.intersection(&eb).collect_vec();
 
                 if locs.len() == 1 {
-                    vals.insert(cn, Origin::CircutLoc(**locs[0])).is_none();
+                    vals.insert(cn, Origin::CircutLoc(**locs[0]));
                     update_waitingb(input, waiting_on, vals, cn, bad_wires);
                 }
             }
@@ -321,14 +320,14 @@ fn other_input(loc: CircutLoc, b: Origin) -> Origin {
 
         (_, CircutLoc::XOr1(n)) | (_, CircutLoc::AND1(n)) => Origin::Input(n),
 
-        (Origin::CircutLoc(CircutLoc::XOr1(a)), CircutLoc::AND2(n)) if n == 1 => {
+        (Origin::CircutLoc(CircutLoc::XOr1(_a)), CircutLoc::AND2(n)) if n == 1 => {
             Origin::CircutLoc(CircutLoc::HalfAnd)
         }
-        (Origin::CircutLoc(CircutLoc::XOr1(a)), CircutLoc::AND2(n)) => {
+        (Origin::CircutLoc(CircutLoc::XOr1(_a)), CircutLoc::AND2(n)) => {
             Origin::CircutLoc(CircutLoc::Or(n - 1))
         }
 
-        (Origin::CircutLoc(CircutLoc::Or(a)), CircutLoc::AND2(n)) => {
+        (Origin::CircutLoc(CircutLoc::Or(_a)), CircutLoc::AND2(n)) => {
             Origin::CircutLoc(CircutLoc::XOr1(n))
         }
         (Origin::CircutLoc(CircutLoc::HalfAnd), CircutLoc::AND2(n)) if n == 1 => {
@@ -342,14 +341,14 @@ fn other_input(loc: CircutLoc, b: Origin) -> Origin {
             Origin::CircutLoc(CircutLoc::AND1(n))
         }
 
-        (Origin::CircutLoc(CircutLoc::XOr1(a)), CircutLoc::XOr2(n)) if n == 1 => {
+        (Origin::CircutLoc(CircutLoc::XOr1(_a)), CircutLoc::XOr2(n)) if n == 1 => {
             Origin::CircutLoc(CircutLoc::HalfAnd)
         }
-        (Origin::CircutLoc(CircutLoc::XOr1(a)), CircutLoc::XOr2(n)) => {
+        (Origin::CircutLoc(CircutLoc::XOr1(_a)), CircutLoc::XOr2(n)) => {
             Origin::CircutLoc(CircutLoc::Or(n - 1))
         }
 
-        (Origin::CircutLoc(CircutLoc::Or(a)), CircutLoc::XOr2(n)) => {
+        (Origin::CircutLoc(CircutLoc::Or(_a)), CircutLoc::XOr2(n)) => {
             Origin::CircutLoc(CircutLoc::XOr1(n))
         }
         (Origin::CircutLoc(CircutLoc::HalfAnd), CircutLoc::XOr2(n)) if n == 1 => {
