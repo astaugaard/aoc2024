@@ -46,7 +46,7 @@ fn parser(input: String, _verbose: bool) -> Result<Input, String> {
 }
 
 fn fits(a: &[u16], b: &[u16]) -> bool {
-    a.iter().zip(b.iter()).all(|(a,b)| a + b <= 7)
+    a.iter().zip(b.iter()).all(|(a, b)| a + b <= 7)
 }
 
 fn part_a(input: &Input) -> Option<String> {
@@ -86,8 +86,8 @@ mod tests {
         utils::golden("day25", &DAY, Some("3"), None, false)
     }
 
-    // #[test]
-    // fn finalanswer() {
-    //     utils::finalanswer(1, &DAY, Some("2057374"), Some("23177084"), false);
-    // }
+    #[test]
+    fn finalanswer() {
+        utils::finalanswer(25, &DAY, Some("3483"), None, false);
+    }
 }
